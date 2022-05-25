@@ -14,6 +14,7 @@ const expectedBody = z.object({
 	awayTeamName: z.string().optional(),
 	teamPlayers: z.array(
 		z.object({
+      number: z.number().nullable(),
 			first_name: z.string(),
 			last_name: z.string(),
 			reserve: z.boolean(),
@@ -74,12 +75,13 @@ export const generateMatchCardPdf = async ({
 	homeTeamName?: string;
 	awayTeamName?: string;
 	teamPlayers: {
+    number: number | null;
 		first_name: string
 		last_name: string
 		reserve: boolean
 	}[];
 }): Promise<Buffer> => {
-	const playerRows: { number?: string; name?: string; reserve?: boolean }[] = [];
+	const playerRows: { number?: number | null; name?: string; reserve?: boolean }[] = [];
 	// Need to fill up 25 player rows in the match card
 	for (let i = 0; i < 25; i++) {
 		const player = teamPlayers[i];
@@ -87,6 +89,7 @@ export const generateMatchCardPdf = async ({
 			playerRows.push({
 				name: `${player.last_name}, ${player.first_name}`,
 				reserve: player.reserve,
+        number: player.number
 			});
 		} else {
 			playerRows.push({});
@@ -361,6 +364,7 @@ export default async function handler(
 ) {
 	try {
 		const parsedBody = expectedBody.parse(req.body);
+    console.log('parsedBody', parsedBody)
 		const pdf = await generateMatchCardPdf(parsedBody);
 		res.setHeader('Content-Type', 'application/pdf')
 		res.send(pdf);
