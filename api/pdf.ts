@@ -339,7 +339,7 @@ export const generateMatchCardPdf = async ({
         <div class="observations">
           <div class="row">
             <div class="cell" style="width: 50%; justify-content: center">
-              Observations de l'arbitres
+              Observations de l'arbitre
             </div>
             <div class="cell" style="width: 50%; justify-content: center">
               Observations de l'entraîneur
