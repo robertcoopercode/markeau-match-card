@@ -98,7 +98,7 @@ export const generateMatchCardPdf = async ({
 	const html = `
   <html>
     <head>
-      <title>Match card - ${currentTeamName}</title>
+      <title>Match card — ${currentTeamName}</title>
       <style>
       * {
       font-family: sans-serif;
@@ -194,62 +194,84 @@ export const generateMatchCardPdf = async ({
 			width: 16px;
 			height: 16px;
 		}
+
+    .arrow {
+      margin-left: 0.5rem;
+      height: 16px;
+    }
+    
+    .arrow svg {
+      height: 100%;
+    }
+
+    .label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      opacity: 0.9;
+    }
       </style>
     </head>
     <body>
       <div class="matchCard">
       <div class="row">
       <div class="cell title">
-        Carte de match -&nbsp;<span class="emphasize">${currentTeamName}</span>
+        Carte de match — ${currentTeamName}
       </div>
     </div>
         <div class="row">
           <div class="horizontalPair" style="width: 50%">
-            <div class="cell fixed" style="width: 6rem">
+            <div class="cell fixed label" style="width: 6rem">
               Division
             </div>
-            <div class="cell emphasize">
+            <div class="cell">
               ${divisionName}
             </div>
           </div>
           <div class="horizontalPair" style="width: 50%">
-            <div class="cell fixed" style="width: 6rem">
+            <div class="cell fixed label" style="width: 6rem">
               Date
             </div>
-            <div class="cell emphasize">
+            <div class="cell">
               ${formattedDate}
             </div>
           </div>
         </div>
         <div class="row">
           <div class="horizontalPair" style="width: 50%">
-            <div class="cell fixed" style="width: 6rem">
+            <div class="cell fixed label" style="width: 6rem">
               Match
             </div>
-            <div class="cell emphasize">
+            <div class="cell">
               ${matchNumber}
             </div>
           </div>
           <div class="horizontalPair" style="width: 50%">
-            <div class="cell fixed" style="width: 6rem">
+            <div class="cell fixed label" style="width: 6rem">
               Terrain
             </div>
-            <div class="cell emphasize">
+            <div class="cell">
               ${fieldName}
             </div>
           </div>
         </div>
         <div class="row">
           <div class="horizontalPair" style="width: 70%">
-            <div class="cell fixed" style="width: 10rem">
+            <div class="cell fixed label" style="width: 10rem">
               Visiteur
             </div>
-            <div class="cell">
+            <div class="cell${awayTeamName === currentTeamName ? ' emphasize' : ''}">
               ${awayTeamName}
+              ${awayTeamName === currentTeamName ? `
+              <div class="arrow">
+              <svg viewBox="0 0 65 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.0948 25.0584L0.488156 14.4518C-0.162714 13.8009 -0.162714 12.7456 0.488156 12.0947L11.0948 1.48813C11.7456 0.837254 12.8009 0.837254 13.4518 1.48813C14.1027 2.139 14.1027 3.19428 13.4518 3.84515L5.69036 11.6066L65 11.6066V14.9399L5.69036 14.9399L13.4518 22.7013C14.1027 23.3522 14.1027 24.4075 13.4518 25.0584C12.8009 25.7092 11.7456 25.7092 11.0948 25.0584Z" fill="black" />
+              </svg>
+            </div>
+              ` : ''}
             </div>
           </div>
           <div class="horizontalPair" style="width: 30%">
-            <div class="cell fixed" style="width: 8rem">
+            <div class="cell fixed label" style="width: 8rem">
               Pointage
             </div>
             <div class="cell">
@@ -259,15 +281,22 @@ export const generateMatchCardPdf = async ({
         </div>
         <div class="row">
           <div class="horizontalPair" style="width: 70%">
-            <div class="cell fixed" style="width: 10rem">
+            <div class="cell fixed label" style="width: 10rem">
               Receveur
             </div>
-            <div class="cell">
+            <div class="cell${homeTeamName === currentTeamName ? ' emphasize' : ''}">
               ${homeTeamName}
+              ${homeTeamName === currentTeamName ? `
+              <div class="arrow">
+              <svg viewBox="0 0 65 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.0948 25.0584L0.488156 14.4518C-0.162714 13.8009 -0.162714 12.7456 0.488156 12.0947L11.0948 1.48813C11.7456 0.837254 12.8009 0.837254 13.4518 1.48813C14.1027 2.139 14.1027 3.19428 13.4518 3.84515L5.69036 11.6066L65 11.6066V14.9399L5.69036 14.9399L13.4518 22.7013C14.1027 23.3522 14.1027 24.4075 13.4518 25.0584C12.8009 25.7092 11.7456 25.7092 11.0948 25.0584Z" fill="black" />
+              </svg>
+            </div>
+              ` : ''}
             </div>
           </div>
           <div class="horizontalPair" style="width: 30%">
-            <div class="cell fixed" style="width: 8rem">
+            <div class="cell fixed label" style="width: 8rem">
               Pointage
             </div>
             <div class="cell emphasize">
@@ -276,12 +305,12 @@ export const generateMatchCardPdf = async ({
           </div>
         </div>
         <div class="playerRow"> 
-          <div class="cell fixed" style="width: 4.5rem">Présent</div>
-          <div class="cell fixed" style="width: 3rem">No</div>
-          <div class="cell">Nom</div>
-          <div class="cell fixed" style="width: 3rem">R</div>
-          <div class="cell fixed" style="width: 3rem">Buts</div>
-          <div class="cell fixed" style="width: 3rem">A/E</div>
+          <div class="cell fixed label" style="width: 4.5rem">Présent</div>
+          <div class="cell fixed label" style="width: 3rem">No</div>
+          <div class="cell label">Nom</div>
+          <div class="cell fixed label" style="width: 3rem">R</div>
+          <div class="cell fixed label" style="width: 3rem">Buts</div>
+          <div class="cell fixed label" style="width: 3rem">A/E</div>
         </div>
         ${playerRows
 					.map((player) => {
@@ -306,7 +335,7 @@ export const generateMatchCardPdf = async ({
         <div class="refAndLegend">
           <div class="refs">
             <div class="row">
-              <div class="cell fixed" style="width: 10rem">
+              <div class="cell fixed label" style="width: 10rem">
                 Arbitre
               </div>
               <div class="cell">
@@ -314,7 +343,7 @@ export const generateMatchCardPdf = async ({
               </div>
             </div>
             <div class="row">
-              <div class="cell fixed" style="width: 10rem">
+              <div class="cell fixed label" style="width: 10rem">
                 Arbitre Assistant
               </div>
               <div class="cell">
@@ -322,7 +351,7 @@ export const generateMatchCardPdf = async ({
               </div>
             </div>
             <div class="row">
-              <div class="cell fixed" style="width: 10rem">
+              <div class="cell fixed label" style="width: 10rem">
                 Arbitre Assistant
               </div>
               <div class="cell">
@@ -338,10 +367,10 @@ export const generateMatchCardPdf = async ({
         </div>
         <div class="observations">
           <div class="row">
-            <div class="cell" style="width: 50%; justify-content: center">
+            <div class="cell label" style="width: 50%; justify-content: center">
               Observations de l'arbitre
             </div>
-            <div class="cell" style="width: 50%; justify-content: center">
+            <div class="cell label" style="width: 50%; justify-content: center">
               Observations de l'entraîneur
             </div>
           </div>
