@@ -401,8 +401,8 @@ export default async function handler(
 		console.log('Generating pdf')
 		const pdf = await generateMatchCardPdf(parsedBody);
 		console.log('Generated pdf')
-		// res.setHeader('Content-Type', 'application/pdf')
-		res.send('hello');
+		res.setHeader('Content-Type', 'application/pdf')
+		res.send(pdf);
 		return;
 	} catch (e) {
 		console.log('error', e)
