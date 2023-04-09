@@ -2,28 +2,28 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import chromium from 'chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
-import { z, ZodError } from "zod";
+// import { z, ZodError } from "zod";
 
-const expectedBody = z.object({
-	divisionName: z.string(),
-	formattedDate: z.string().optional(),
-	matchNumber: z.string().optional(),
-	fieldName: z.string().optional(),
-	currentTeamName: z.string(),
-	homeTeamName: z.string().optional(),
-	awayTeamName: z.string().optional(),
-	teamPlayers: z.array(
-		z.object({
-			number: z.number().nullable(),
-			first_name: z.string(),
-			last_name: z.string(),
-			reserve: z.boolean(),
-			suspended: z.boolean().optional(),
-		})
-	)
-})
-
-type ExpectedBody = z.infer<typeof expectedBody>;
+// const expectedBody = z.object({
+// 	divisionName: z.string(),
+// 	formattedDate: z.string().optional(),
+// 	matchNumber: z.string().optional(),
+// 	fieldName: z.string().optional(),
+// 	currentTeamName: z.string(),
+// 	homeTeamName: z.string().optional(),
+// 	awayTeamName: z.string().optional(),
+// 	teamPlayers: z.array(
+// 		z.object({
+// 			number: z.number().nullable(),
+// 			first_name: z.string(),
+// 			last_name: z.string(),
+// 			reserve: z.boolean(),
+// 			suspended: z.boolean().optional(),
+// 		})
+// 	)
+// })
+//
+// type ExpectedBody = z.infer<typeof expectedBody>;
 
 const generatePdf = async (html = '') => {
 	const options = process.env.AWS_REGION
@@ -58,6 +58,23 @@ const generatePdf = async (html = '') => {
 	return pdfBuffer;
 };
 
+type Payload = {
+	divisionName: string;
+	formattedDate?: string;
+	matchNumber?: string;
+	fieldName?: string;
+	currentTeamName: string;
+	homeTeamName?: string;
+	awayTeamName?: string;
+	teamPlayers: {
+		number: number | null;
+		first_name: string;
+		last_name: string;
+		reserve: boolean;
+		suspended?: boolean;
+	}[];
+};
+
 export const generateMatchCardPdf = async ({
 	divisionName,
 	formattedDate,
@@ -67,22 +84,7 @@ export const generateMatchCardPdf = async ({
 	homeTeamName,
 	awayTeamName,
 	teamPlayers,
-}: {
-	divisionName: string;
-	formattedDate?: string;
-	matchNumber?: string;
-	fieldName?: string;
-	currentTeamName: string;
-	homeTeamName?: string;
-	awayTeamName?: string;
-	teamPlayers: {
-    	number: number | null;
-		first_name: string;
-		last_name: string;
-		reserve: boolean;
-		suspended?: boolean;
-	}[];
-}): Promise<Buffer> => {
+}: Payload): Promise<Buffer> => {
 	const playerRows: { number?: number | null; name?: string; reserve?: boolean; suspended?: boolean }[] = [];
 	// Need to fill up 25 player rows in the match card
 	for (let i = 0; i < 25; i++) {
@@ -396,21 +398,21 @@ export default async function handler(
 ) {
 	try {
 		console.log("Starting to parse body")
-		const parsedBody = expectedBody.parse(req.body);
-		console.log('Parsed body', parsedBody)
+		// const parsedBody = expectedBody.parse(req.body);
+		// console.log('Parsed body', parsedBody)
 		console.log('Generating pdf')
-		const pdf = await generateMatchCardPdf(parsedBody);
+		const pdf = await generateMatchCardPdf(req.body as Payload);
 		console.log('Generated pdf')
 		res.setHeader('Content-Type', 'application/pdf')
 		res.send(pdf);
 		return;
 	} catch (e) {
 		console.log('error', e)
-		if (e instanceof ZodError) {
-			res.status(400).json("Unexpected body");
-		} else {
+		// if (e instanceof ZodError) {
+		// 	res.status(400).json("Unexpected body");
+		// } else {
 			res.status(400).json("Something went wrong");
-		}
+		// }
 		return;
 	}
 }
