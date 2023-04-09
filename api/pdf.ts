@@ -395,13 +395,17 @@ export default async function handler(
   res: NextApiResponse<string | 	Buffer>
 ) {
 	try {
+		console.log("Starting to parse body")
 		const parsedBody = expectedBody.parse(req.body);
-		console.log('parsedBody', parsedBody)
+		console.log('Parsed body', parsedBody)
+		console.log('Generating pdf')
 		const pdf = await generateMatchCardPdf(parsedBody);
+		console.log('Generated pdf')
 		res.setHeader('Content-Type', 'application/pdf')
 		res.send(pdf);
 		return;
 	} catch (e) {
+		console.log('error', e)
 		if (e instanceof ZodError) {
 			res.status(400).json("Unexpected body");
 		} else {
