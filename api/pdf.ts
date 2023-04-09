@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import chromium from 'chrome-aws-lambda';
-import pw from 'playwright-core';
+import puppeteer from 'puppeteer-core';
 import { z, ZodError } from "zod";
 
 const expectedBody = z.object({
@@ -42,7 +42,7 @@ const generatePdf = async (html = '') => {
 						: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
 		  };
 
-	const browser = await pw.chromium.launch(options);
+	const browser = await puppeteer.launch(options);
 	const page = await browser.newPage();
 
 	await page.setContent(html);
