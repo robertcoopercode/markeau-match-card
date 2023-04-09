@@ -396,6 +396,7 @@ export default async function handler(
 ) {
 	try {
 		const parsedBody = expectedBody.parse(req.body);
+		console.log('parsedBody', parsedBody)
 		const pdf = await generateMatchCardPdf(parsedBody);
 		res.setHeader('Content-Type', 'application/pdf')
 		res.send(pdf);
