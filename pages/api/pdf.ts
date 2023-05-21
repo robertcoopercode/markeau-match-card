@@ -1,6 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import puppeteer from 'puppeteer-core';
+import {executablePath} from 'puppeteer-core';
+
 import { z, ZodError } from "zod";
 
 const expectedBody = z.object({
@@ -24,23 +26,52 @@ const expectedBody = z.object({
 
 type ExpectedBody = z.infer<typeof expectedBody>;
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+const getBrowser = () =>
+	IS_PRODUCTION
+		?
+		puppeteer.connect({
+			// Hosted browserless. Stopped using as I needed to get on a paid plan
+			// browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`,
+			browserWSEndpoint: `wss://browserless-production-50c8.up.railway.app`,
+		})
+		:
+		puppeteer.connect({
+			// Run the browserless container locally using ` docker run -p 3002:3000 browserless/chrome` locally while in development
+			// browserWSEndpoint: `ws://localhost:3002`,
+			browserWSEndpoint: `wss://browserless-production-50c8.up.railway.app`,
+		})
+
 const generatePdf = async (html = '') => {
-	const browser = await puppeteer.connect({
-		browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`,
-	});
-	const page = await browser.newPage();
+	let browser = null;
+	let pdfBuffer = null;
+	try {
+		browser = await getBrowser();
+		const page = await browser.newPage();
 
-	await page.setContent(html);
+		console.log("Setting page content")
 
-	const pdfBuffer = await page.pdf({
-		format: 'letter',
-		pageRanges: '1',
-	});
+		await page.setContent(html);
 
-	await page.close();
-	await browser.close();
+		console.log("Getting PDF buffer")
 
-	return pdfBuffer;
+		pdfBuffer = await page.pdf({
+			format: 'letter',
+			pageRanges: '1',
+		});
+
+		await page.close();
+
+	} catch (e) {
+		console.error(e)
+	} finally {
+		if (browser) {
+			console.log("Closing browser in finally")
+			await browser.close();
+		}
+		return pdfBuffer;
+	}
 };
 
 export const generateMatchCardPdf = async ({
