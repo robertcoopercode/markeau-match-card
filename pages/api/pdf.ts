@@ -83,7 +83,7 @@ export const generateMatchCardPdf = async ({
 	homeTeamName,
 	awayTeamName,
 	teamPlayers,
-}: ExpectedBody): Promise<Buffer> => {
+}: ExpectedBody): Promise<Buffer | null> => {
 	const playerRows: { number?: number | null; name?: string; reserve?: boolean; suspended?: boolean }[] = [];
 	// Need to fill up 25 player rows in the match card
 	for (let i = 0; i < 25; i++) {
@@ -402,6 +402,10 @@ export default async function handler(
 		console.log('Generating pdf')
 		const pdf = await generateMatchCardPdf(parsedBody);
 		console.log('Generated pdf')
+		if (!pdf) {
+			res.status(400).json("Something went wrong");
+			return;
+		}
 		res.setHeader('Content-Type', 'application/pdf')
 		res.send(pdf);
 		return;
